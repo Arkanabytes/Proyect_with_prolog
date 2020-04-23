@@ -1,0 +1,136 @@
+%----------------------------------------------------------------------------
+% Actividad Obligatoria 2 de Fundamentos de Inteligencia Articial 2016/17
+% ---------------------------------------------------------------------------
+
+%Para empezar a ejecutar el programa teclear 'inicio.'
+
+%---------- BASE DE CONOCIMIENTO --------------------------------------------
+
+%El predicado alimento con aridad 4 se declara dinámico para poder operar con retract (elimina de la base de hechos)
+%y assert (agrega a la base de hechos)
+:-dynamic(alimento/4).
+
+%alimento(numero,nombre,densidadCalorica,peso) indica la densidad calórica de un alimento en concreto y para qué peso está indicado
+alimento(1,fresas,muy_baja,sobrepeso).
+alimento(2,lechuga,muy_baja,sobrepeso).
+alimento(3,leche_desnatada,muy_baja_calorica,sobrepeso).
+alimento(4,infusion,muy_baja,sobrepeso).
+alimento(5,yogur_desnatado,muy_baja,sobrepeso).
+alimento(6,gelatina_sin_azucar,muy_baja,sobrepeso).
+alimento(7,lentejas,baja,sobrepeso).
+alimento(8,avena,baja,sobrepeso).
+alimento(8,arroz,baja,sobrepeso).
+alimento(9,queso_untable_desnatado,baja,sobrepeso).
+alimento(10,requeson_desnatado,baja,sobrepeso).
+alimento(11,filete_vaca,moderada,normal).
+alimento(12,filete_cerdo,moderada,normal).
+alimento(13,filete_pollo,moderada,normal).
+alimento(14,pan,moderada,normal).
+alimento(15,queso,moderada,normal).
+alimento(16,requeson,moderada,normal).
+alimento(17,cacahuete,alta,bajo_peso).
+alimento(18,aceite,alta,bajo_peso).
+alimento(19,manteca,alta,bajo_peso).
+alimento(20,mayonesa,alta,bajo_peso).
+alimento(21,nata,alta,bajo_peso).
+alimento(22,chocolate,alta,bajo_peso).
+
+%---------- Menú con detección de opciones incorrectas ---------------------
+
+%inicio, menú principal de opciones
+inicio:-write('Escoge una opción de entre las siguientes:\n\n'),
+              write(' 1-Ver todos los alimentos de la Base de Conocimiento\n'),
+              write(' 2-Introducir un alimento en la Base de Conocimiento\n'),
+              write(' 3-Eliminar un alimento de la Base de Conocimiento\n'),
+              write(' 4-Recomiéndame alimentos\n'),
+              write('\n         0-Salir\n\n'),
+              write('Opción: '),
+         read(Op), borrarPantalla, ejecutar(Op). 
+
+%---------- Subrutinas ------------------------------------------------------
+
+% Constante para borrar la pantalla
+borrarPantalla:-write('\033[2J').
+
+ejecutar(Op) :- Op == 1, accion1;
+                Op == 2, accion2;
+                Op == 3, accion3;
+                Op == 4, accion4;
+                Op > 4, accion;
+                Op < 0, accion; 
+                Op == 0, true. 
+
+%accion(_), opcion incorrecta, se pedirá nuevamente una entrada
+accion:-!,write('Opcion incorrecta.\n\n'),inicio.
+
+%accion1, se mostraran todos los alimentos de la Base de Conocimiento mediante recursividad
+accion1:-!,borrarPantalla,write('Preparado... \n\n'),
+        findall(Alim, alimento(_,Alim,_,_), ListaAlim),
+	muestraAll(ListaAlim),write('\n\n'),inicio.
+
+muestraAll([]) :- !.
+muestraAll([C|ListaRef]) :- write(C), nl,
+	muestraAll(ListaRef).
+
+%accion2, se pedirá al usuario que introduzca un alimento en la Base de Conocimiento
+accion2:-!, write('	Número de alimento: '),
+	write('Por favor, separa las palabras con guiones bajos (_) en lugar de espacios ( )\n\n'),
+	read(I),
+write('\n	Nombre del alimento: '),
+	read(N),
+write('\n	Densidad calórica: '),
+	read(D),
+write('\n	Peso para el que está indicado: '),
+	read(P),
+	almacenar(I,N,D,P).
+
+%almacenar(I,N,D,P) almacenara un nuevo hecho (alimento en este caso) en la base de conocimiento
+almacenar(I,N,D,P):-write('\n'),assertz(alimento(I,N,D,P)),write('Alimento añadido\n\n'),inicio.
+
+%accion3, se pedirá al usuario qué alimento(I,N,D,P) desea eliminar de la Base de conocimiento
+accion3:-!,write('Eliminar alimento de la Base de Conocimiento: \n\n'),
+write('	Número de alimento: '),
+	read(I),
+write('\n	Nombre del alimento: '),
+	read(N),
+write('\n	Densidad calórica: '),
+	read(D),
+write('\n	Peso para el que está indicado: '),
+	read(P),
+        eliminar(I,N,D,P).
+
+%eliminar(I,N,D,P) elimina alimento con índice I, nombre N, densidad calórica D y peso P de la Base de conocimiento
+eliminar(I,N,D,P):-write('\n'),retract(alimento(I,N,D,P)),!,inicio.
+
+%accion4, se aconsejarán alimentos en función del peso del usuario 
+accion4:-
+	write('Introduce tu peso. \n\n'),
+	write('Opciones posibles: \n|bajo_peso|normal|sobrepeso|\n\n'),
+	read(Peso),
+	write('\n'),
+	findall(Alim, alimento(_,Alim,_,Peso), ListaAlim),
+	muestraAlimentos(ListaAlim),write('\n'),
+	length(ListaAlim, Cant1),	%Result is Cant1 - 1,
+	write('El total de alimentos es:'),write(Cant1),write('\n\n'),inicio.
+
+muestraAlimentos([]) :- !.
+muestraAlimentos([C|ListaPeso]) :- write(C), nl,
+	muestraAlimentos(ListaPeso).
+
+%--------------------------Línea de comandos-------------------------
+
+persona(Antonio).
+persona(Angel).
+objeto(caja).
+
+gordo(Antonio).
+delgado(Angel).
+
+%Antonio baja de peso.
+bajaPeso(Antonio).
+
+% Un alimento es saludable para una persona gorda si está marcado como alimento para sobrepeso.
+saludableComer(N,A):-persona(N),gordo(N),alimento(I,A,D,P),P == sobrepeso.
+
+% Una persona está a dieta si come alimentos saludables y baja de peso
+aDieta(N,A):-saludableComer(N,A), bajaPeso(N).
