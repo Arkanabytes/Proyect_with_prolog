@@ -1,0 +1,485 @@
+%Cada una de las salas del museo
+entrada_museo.
+sala_dos.
+sala_tres.
+sala_cuatro.
+sala_vip.
+sala_menor.
+sala_mayor.
+salida.
+tienda.
+
+%Las piezas expuestas
+
+cuadro_uno.
+cuadro_dos.
+cuadro_tres.
+cuadro_cuatro.
+cuadro_cinco.
+cuadro_seis.
+cuadro_siete.
+escultura_uno.
+escultura_dos.
+escultura_tres.
+escultura_cuatro.
+escultura_cinco.
+escultura_seis.
+escultura_siete.
+
+%Cada uno de los tipos de visitante
+
+curioso.
+postureo.
+perfecto.
+gorron.
+
+%recorridos predeterminados
+
+itinerario_previsto(ITVisita) :- ITVisita==curioso, write('\n\nSu recorrido previsto era ->>>> '),
+                                                    write([taquilla, entrada_museo, sala_dos, sala_menor, sala_mayor]).
+itinerario_previsto(ITVisita) :- ITVisita==postureo, write('\n\nSu recorrido previsto era ->>>> '),
+                                                    write([taquilla,entrada_museo, sala_tres, sala_dos, tienda]).
+itinerario_previsto(ITVisita) :- ITVisita==perfecto, write('\n\nSu recorrido previsto era ->>>> '),
+                                                    write([taquilla,entrada_museo, sala_dos, sala_mayor, sala_menor, sala_vip]).
+itinerario_previsto(ITVisita) :- ITVisita==gorron, write('\n\nSu recorrido previsto era ->>>> '),
+                                                    write([taquilla,entrada_museo, sala_tres, sala_cuatro, tienda]).
+
+%Comprobar si coincide el tipo de visitante con el previsto
+es_visitante(Es_Visitante) :- tipoVisitante(Es_Visitante).
+
+
+%Predicados dinámicos
+:-dynamic nombreVisitante/1, tipoVisitante/1, visitaActual/4,valoracionVisita/1, maximaValoracion/1, minimaValoracion/1.
+:-dynamic salaVisita/1, salasVisitadas/1.,
+
+%Inicializamos SalasVisitadas
+salasVisitadas([taquilla]).
+
+
+%detenemos el programa para que el visitante contemple las obras
+observar :- write('\n\n\nCuando quiera continuar pulse Enter'), skip(10), skip(10).
+
+%conjunto de predicados de las obras expuestas
+pieza_mostrada(cuadro_uno) :- write('Este cuadro de arte moderno, muestra una mezcla de colores cálidos, sin orden aparente,'),nl,
+                              write('pero con cierto parecido a un baile tribal de pequeños demonios. Una bella pieza.').
+
+pieza_mostrada(cuadro_dos) :- write('Un interesante bodegón de colores vivos y formas irreales, dejando lugar a la imaginación,'),nl,
+                              write('sin duda las fantasías de muchas personas se ven reflejadas en él.').
+
+pieza_mostrada(cuadro_tres) :- write('Lo único reconocible es un ojo femenino, rodeado de colores atrevidos, formas geométricas,'),nl,
+                               write('que se asemeja y mucho a algunos carteles de cine. Es extraño y curioso a la vez.').
+
+
+pieza_mostrada(cuadro_cuatro) :- write('Por alguna extraña razón todo el mundo piensa que este es un cuadro famoso, si bien no se'),nl,
+                                 write('conoce a su autor, esas formas tan reconocibles sugieren que estamos ante una pieza original.').
+
+pieza_mostrada(cuadro_cinco) :- write('Sólo unos pocos privilegiados pueden contemplar esta pieza única y original de Andy Warhol,'),nl,
+                                write('normalmente esta pieza no suele estar expuesta, por lo que está de suerte.').
+
+pieza_mostrada(cuadro_seis) :- write('Este cuadro impresionista de un artista local sin duda será un deleite para aquellos que '),nl,
+                               write('aprecian el arte, si bien no es del gusto general, el autor nos fascina, ¿a que sí?.').
+
+pieza_mostrada(cuadro_siete) :- write('Una fiesta de colores y formas nos sugieren un cuadro de múltiples interpretaciones, '),nl,
+                                write('algunos visitantes dicen que les recuerda a su niñez, a otros les desagrada, ¿azul o roja?.').  
+
+pieza_mostrada(escultura_uno) :- write('Este escultura redondeada y con formas imposibles, nos recuerdan a aquellas pesadillas '),nl,
+                                 write('de nuestra infancia, una belleza terrible y maravillosa a la vez, fascinante.').
+
+pieza_mostrada(escultura_dos) :- write('Extraña escultura asimétrica y con bordes rectos, en la que según la posición del '),nl,
+                                 write('visitante observará distintas escenas de un suceso ancestral, no apto para todas las mentes.').                                  
+
+pieza_mostrada(escultura_tres) :- write('El mármol nunca desagrada, la belleza clásica griega mezclada con un toque innovador '),nl,
+                                  write('que no deja indiferente a nadie, una pieza muy incomprendida.').
+
+pieza_mostrada(escultura_cuatro) :- write('Un huevo coloreado no deja indiferente a nadie, todo el mundo se quiere hacer una foto '),nl,
+                                    write('con la famosa réplica del huevo de pájaro Dodo realizada por un extravagante artista.').                                  
+
+
+pieza_mostrada(escultura_cinco) :- write('Una lata de alubias con tomate Heinz sobredimensionada y abierta, una composición '),nl,
+                                   write('demasiado atrevida para todo el mundo, sin duda es la mejor antesala para ir a comprar.').
+
+pieza_mostrada(escultura_seis) :- write('Esta composición de una figura humana sin rostro, en metal, mirando hacia un cuadro en'),nl,
+                                  write('en blanco, es una de nuestras últimas adquisiciones, una pieza muy interesante.').                                  
+
+pieza_mostrada(escultura_siete) :- write('Una escultura que evoca al árte tribal africano, realizada en corcho y metal, '),nl,
+                                   write('nos muestran una mezcla un tanto extraña y fuera de luegar, ¿quién la puso aquí?.').                                  
+
+
+%conjunto de predicados sobre la reaccion a dichas obras
+reaccion_visita(Pieza, Observador) :- obraSeleccionada(Pieza)==obraSeleccionada(cuadro_uno), tipoVisitante(Observador)==tipoVisitante(curioso),
+                                     write('\nSu elección es la más adecuada\n'), observar, valor_seleccion(20), cambiar_de_sala(sala_dos),visita_sala_dos.
+
+reaccion_visita(Pieza, Observador) :- obraSeleccionada(Pieza)==obraSeleccionada(cuadro_uno), tipoVisitante(Observador)==tipoVisitante(postureo),
+                                      write('\nLa siguiente sala es la favorita para postureo, suerte con las fotos\n'),
+                                      observar, valor_seleccion(20), cambiar_de_sala(sala_tres), visita_sala_tres.
+
+reaccion_visita(Pieza, Observador) :- obraSeleccionada(Pieza)==obraSeleccionada(cuadro_uno), tipoVisitante(Observador)==tipoVisitante(perfecto),
+                                      write('\nSe nota que entiende de arte\n'),
+                                      observar, valor_seleccion(20), cambiar_de_sala(sala_dos), visita_sala_dos.      
+
+reaccion_visita(Pieza, Observador) :- obraSeleccionada(Pieza)==obraSeleccionada(cuadro_uno), tipoVisitante(Observador)==tipoVisitante(gorron),
+                                      write('\nPase a la siguiente sala que la salida le pilla cerca\n'),
+                                      observar, valor_seleccion(10), cambiar_de_sala(sala_cuatro), visita_sala_cuatro.                                                                      
+
+reaccion_visita(Pieza, Observador) :- obraSeleccionada(Pieza)==obraSeleccionada(cuadro_dos), tipoVisitante(Observador)==tipoVisitante(curioso),
+                                     write('\nSin duda confirma el recorrido propuesto para usted, buen gusto\n'), observar,
+                                     valor_seleccion(30),cambiar_de_sala(sala_dos),visita_sala_dos.
+
+reaccion_visita(Pieza, Observador) :- obraSeleccionada(Pieza)==obraSeleccionada(cuadro_dos), tipoVisitante(Observador)==tipoVisitante(perfecto),
+                                     write('\nVaya, le habíamos propuesto un recorrido mejor, aún podrá enmendarlo en la siguiente sala\n'), observar,
+                                     valor_seleccion(10),cambiar_de_sala(sala_menor),visita_sala_seis.                                     
+
+reaccion_visita(Pieza, Observador) :- obraSeleccionada(Pieza)==obraSeleccionada(cuadro_dos), tipoVisitante(Observador)==tipoVisitante(postureo),
+                                     write('\nEn la siguiente sala a lo mejor consigue hacer alguna foto ... no lo creo\n'),
+                                     observar, valor_seleccion(15), cambiar_de_sala(sala_tres), visita_sala_tres.
+
+reaccion_visita(Pieza, Observador) :- obraSeleccionada(Pieza)==obraSeleccionada(cuadro_dos), tipoVisitante(Observador)==tipoVisitante(gorron),
+                                     write('\nVaya, pese a no pagar por ello, al menos valora lo bueno, prepare la cartera\n'),
+                                     observar, valor_seleccion(20), cambiar_de_sala(sala_cuatro), visita_sala_cuatro.                                     
+
+
+reaccion_visita(Pieza, Observador) :- obraSeleccionada(Pieza)==obraSeleccionada(escultura_uno), tipoVisitante(Observador)==tipoVisitante(curioso),
+                                     write('\nLa curiosidad le llevará a la siguiente sala, especialmente para gente como usted\n'),
+                                     observar, valor_seleccion(10),cambiar_de_sala(sala_tres),visita_sala_tres.
+
+reaccion_visita(Pieza, Observador) :- obraSeleccionada(Pieza)==obraSeleccionada(escultura_uno), tipoVisitante(Observador)==tipoVisitante(perfecto),
+                                     write('\nSin duda la mejor elección posible, sigamos con el itinerario previsto\n'),
+                                     observar, valor_seleccion(30),cambiar_de_sala(sala_dos),visita_sala_dos.                                     
+
+reaccion_visita(Pieza, Observador) :- obraSeleccionada(Pieza)==obraSeleccionada(escultura_uno), tipoVisitante(Observador)==tipoVisitante(postureo),
+                                      write('\nEstá claro que lo del postureo no es lo suyo, le llevaremos a una sala marginal\n'),
+                                      observar, valor_seleccion(10), cambiar_de_sala(sala_cuatro), visita_sala_cuatro.
+
+reaccion_visita(Pieza, Observador) :- obraSeleccionada(Pieza)==obraSeleccionada(escultura_uno), tipoVisitante(Observador)==tipoVisitante(gorron),
+                                      write('\nInteresante ... veamos si en la siguiente sala nos sorprende\n'),
+                                      observar, valor_seleccion(30), cambiar_de_sala(sala_tres), visita_sala_tres.                                      
+
+reaccion_visita(Pieza, Observador) :- obraSeleccionada(Pieza)==obraSeleccionada(cuadro_tres), tipoVisitante(Observador)==tipoVisitante(curioso),
+                                      write('\nSu elección vuelve a ser la esperada\n'), observar,
+                                      valor_seleccion(20), cambiar_de_sala(sala_menor),visita_sala_seis.
+
+reaccion_visita(Pieza, Observador) :- obraSeleccionada(Pieza)==obraSeleccionada(cuadro_tres), tipoVisitante(Observador)==tipoVisitante(postureo),
+                                      write('\nSeleccionó la peor de las tres opciones, pase por la tienda y compre algo por favor\n'),
+                                      observar, valor_seleccion(10), cambiar_de_sala(tienda), visita_tienda.
+
+reaccion_visita(Pieza, Observador) :- obraSeleccionada(Pieza)==obraSeleccionada(cuadro_tres), tipoVisitante(Observador)==tipoVisitante(perfecto),
+                                      write('\nSu elección pese a no ser la esperada, le traerá nuevas experiencias\n'), observar,
+                                      valor_seleccion(30), cambiar_de_sala(sala_menor),visita_sala_seis.                                      
+
+reaccion_visita(Pieza, Observador) :- obraSeleccionada(Pieza)==obraSeleccionada(escultura_dos), tipoVisitante(Observador)==tipoVisitante(curioso),
+                                      write('\nSu curiosidad espero que esté saciada, vaya a la tienda que no tiene nada más que ver\n'),
+                                      observar, valor_seleccion(10), cambiar_de_sala(sala_cuatro),visita_sala_cuatro.
+
+reaccion_visita(Pieza, Observador) :- obraSeleccionada(Pieza)==obraSeleccionada(escultura_dos), tipoVisitante(Observador)==tipoVisitante(perfecto),
+                                      write('\nNos satisface saber que está siguiendo el itinerario previsto\n'),
+                                      observar, valor_seleccion(20), cambiar_de_sala(sala_mayor),visita_sala_siete.                                      
+
+reaccion_visita(Pieza, Observador) :- obraSeleccionada(Pieza)==obraSeleccionada(escultura_dos), tipoVisitante(Observador)==tipoVisitante(postureo),
+                                      write('\nSu elección ha mejorado el recorrido previsto, me sorprende\n'),
+                                      observar, valor_seleccion(20), cambiar_de_sala(sala_menor), visita_sala_seis.
+
+reaccion_visita(Pieza, Observador) :- obraSeleccionada(Pieza)==obraSeleccionada(escultura_tres), tipoVisitante(Observador)==tipoVisitante(curioso),
+                                      write('\nSin duda la mejor elección, confirma el recorrido previsto, adelante\n'),
+                                      observar, valor_seleccion(30), cambiar_de_sala(sala_menor),visita_sala_seis.
+
+reaccion_visita(Pieza, Observador) :- obraSeleccionada(Pieza)==obraSeleccionada(escultura_tres), tipoVisitante(Observador)==tipoVisitante(perfecto),
+                                      write('\nSin duda la mejor elección, confirma el recorrido previsto, adelante\n'),
+                                      observar, valor_seleccion(30), cambiar_de_sala(sala_mayor),visita_sala_siete.                                      
+
+reaccion_visita(Pieza, Observador) :- obraSeleccionada(Pieza)==obraSeleccionada(escultura_tres), tipoVisitante(Observador)==tipoVisitante(postureo),
+                                      write('\nEspero que hayas hecho las fotos que querías\n'), observar,
+                                      valor_seleccion(15), cambiar_de_sala(salida), salida_museo.
+
+
+reaccion_visita(Pieza, Observador) :- obraSeleccionada(Pieza)==obraSeleccionada(cuadro_cuatro), tipoVisitante(Observador)==tipoVisitante(curioso),
+                                      write("\nBueno, tu tendencia ha cambiado a mejor, la siguiente sala estaba en tu recorrido inicial\n"),
+                                      observar, valor_seleccion(20), cambiar_de_sala(sala_menor),visita_sala_seis.
+
+reaccion_visita(Pieza, Observador) :- obraSeleccionada(Pieza)==obraSeleccionada(cuadro_cuatro), tipoVisitante(Observador)==tipoVisitante(postureo),
+                                      write("\n¿Seguro que vino a posturear o también entiende de esto?\n"),
+                                      observar, valor_seleccion(20), cambiar_de_sala(sala_dos),visita_sala_dos.
+
+reaccion_visita(Pieza, Observador) :- obraSeleccionada(Pieza)==obraSeleccionada(cuadro_cuatro), tipoVisitante(Observador)==tipoVisitante(gorron),
+                                      write("\nDefinitivamente nos ha sorprendido, buena elección, pase a la siguiente sala\n"),
+                                      observar, valor_seleccion(20), cambiar_de_sala(sala_cuatro),visita_sala_cuatro.                                      
+
+reaccion_visita(Pieza, Observador) :- obraSeleccionada(Pieza)==obraSeleccionada(escultura_cuatro), tipoVisitante(Observador)==tipoVisitante(curioso),
+                                      write("\nLo mejor es que vuelva otro día con la mente más fresca\n"),
+                                      observar, valor_seleccion(10), cambiar_de_sala(sala_cuatro),visita_sala_cuatro.
+
+reaccion_visita(Pieza, Observador) :- obraSeleccionada(Pieza)==obraSeleccionada(escultura_cuatro), tipoVisitante(Observador)==tipoVisitante(postureo),
+                                      write("\nPase a la siguiente sala que será la última, espero que haya hecho buenas fotos\n"),
+                                      observar, valor_seleccion(10), cambiar_de_sala(sala_menor),visita_sala_seis.                                      
+
+reaccion_visita(Pieza, Observador) :- obraSeleccionada(Pieza)==obraSeleccionada(escultura_cuatro), tipoVisitante(Observador)==tipoVisitante(gorron),
+                                      write("\nUna pena, en fin, ahora prepare la cartera\n"),
+                                      observar, valor_seleccion(10), cambiar_de_sala(tienda),visita_tienda.
+
+reaccion_visita(Pieza, Observador) :- obraSeleccionada(Pieza)==obraSeleccionada(cuadro_seis), tipoVisitante(Observador)==tipoVisitante(curioso),
+                                      write("\nSin duda el recorrido sugerido se está cumpliendo, veremos si en la próxima sala nos sorprende\n"),
+                                      observar, valor_seleccion(20), cambiar_de_sala(sala_mayor),visita_sala_siete.
+
+reaccion_visita(Pieza, Observador) :- obraSeleccionada(Pieza)==obraSeleccionada(cuadro_seis), tipoVisitante(Observador)==tipoVisitante(perfecto),
+                                      write("\nSin duda el recorrido sugerido se está cumpliendo, la próxima sala le va a sorprender\n"),
+                                      observar, valor_seleccion(20), cambiar_de_sala(sala_vip),visita_sala_cinco.                                      
+
+reaccion_visita(Pieza, Observador) :- obraSeleccionada(Pieza)==obraSeleccionada(cuadro_seis), tipoVisitante(Observador)==tipoVisitante(postureo),
+                                      write("\nPues su visita ha terminado, la salida está por aquí\n"),
+                                      observar, valor_seleccion(10), cambiar_de_sala(salida),salida_museo.                                      
+
+reaccion_visita(Pieza, Observador) :- obraSeleccionada(Pieza)==obraSeleccionada(cuadro_siete), tipoVisitante(Observador)==tipoVisitante(curioso),
+                                      write("\nCasi mejor lo dejamos aquí, la salida está por allí"),observar,
+                                      valor_seleccion(10), cambiar_de_sala(salida),salida_museo.
+
+reaccion_visita(Pieza, Observador) :- obraSeleccionada(Pieza)==obraSeleccionada(cuadro_siete), tipoVisitante(Observador)==tipoVisitante(perfecto),
+                                      write("\nPues me parece que su visita va a acabar en breve, la siguiente sala será la última"),observar,
+                                      valor_seleccion(10), cambiar_de_sala(sala_cuatro),visita_sala_cuatro.                                      
+
+reaccion_visita(Pieza, Observador) :- obraSeleccionada(Pieza)==obraSeleccionada(cuadro_siete), tipoVisitante(Observador)==tipoVisitante(postureo),
+                                      write('\nNos aprovecharemos de su ignorancia en la tienda\n'),observar,
+                                      valor_seleccion(15), cambiar_de_sala(tienda), visita_tienda.   
+
+reaccion_visita(Pieza, Observador) :- obraSeleccionada(Pieza)==obraSeleccionada(escultura_seis), tipoVisitante(Observador)==tipoVisitante(curioso),
+                                      write("\nBueno, su visita ha sido realmente muy interesante, la salida está por aquí\n"),observar,
+                                      valor_seleccion(20), cambiar_de_sala(salida),salida_museo.    
+
+reaccion_visita(Pieza, Observador) :- obraSeleccionada(Pieza)==obraSeleccionada(escultura_seis), tipoVisitante(Observador)==tipoVisitante(perfecto),
+                                      write("\nSin duda se merece el acceso a nuestra exclusiva sala\n"),observar,
+                                      valor_seleccion(20), cambiar_de_sala(sala_vip),visita_sala_cinco.
+
+reaccion_visita(Pieza, Observador) :- obraSeleccionada(Pieza)==obraSeleccionada(escultura_siete), tipoVisitante(Observador)==tipoVisitante(curioso),
+                                      write("\nA veces la curiosidad puede tener recompensa, le invitamos a la exclusiva sala reservada, pase y vea\n"),observar,
+                                      valor_seleccion(40), cambiar_de_sala(sala_vip),visita_sala_cinco.
+
+reaccion_visita(Pieza, Observador) :- obraSeleccionada(Pieza)==obraSeleccionada(escultura_siete), tipoVisitante(Observador)==tipoVisitante(perfecto),
+                                      write("\nSalvo sorpresa inesperada, su experiencia le va a gustar, siga por aquí a la siguiente sala\n"),observar,
+                                      valor_seleccion(30), cambiar_de_sala(sala_menor),visita_sala_seis.                                      
+
+
+
+%predicado que limpia la pantalla
+clearScreen :- write('\33[2J').
+
+%predicado para cambiar de sala
+cambiar_de_sala(Siguiente_Sala) :- retract(salaVisita(Actual)), add_salas_visitadas(Actual), assert(salaVisita(Siguiente_Sala)).
+
+%predicado que actualiza la valoracion de la visita
+valor_seleccion(Nota):- retract(valoracionVisita(Nota_anterior)), Nota_nueva is Nota_anterior + Nota, 
+                                assert(valoracionVisita(Nota_nueva)). 
+
+%predicado que actualiza los datos del visitante y el estado de la visita
+actualizaVisita(Vactual) :- retract(visitaActual(Vactual, NomActual, Puntua, RecorridoA)), valoracionVisita(NotaN), PuntuaActual is Puntua + NotaN, 
+                                     assert(visitaActual(Vactual, NomActual, PuntuaActual,RecorridoA)).
+
+%se añaden las salas visitadas por el visitante
+add_salas_visitadas(Salas) :- L1=Salas, retract(salasVisitadas(SalasV)), L2=[Salas|SalasV], assert(salasVisitadas(L2)).
+
+
+
+%predicado que sirve de cabecera informativa en las salas
+cabecera_salas :-  clearScreen,write('----------------------------------------------------------------'),nl,
+         write('----------------------------------------------------------------'),nl,
+         write('-------Galería de Arte Contemporáneo Esculturas y Láminas-------\n'),nl,
+         write('-------------------------G-A-C-E-L-A----------------------------'),nl,
+         write('----------------------------------------------------------------'),nl.
+
+%predicado que inicia el programa
+gacela:- clearScreen, cabecera_salas,
+        
+         write('\n\nUna galería de arte interactiva que en función de sus reacciones\n'),
+         write('con las piezas expuestas le irá dando acceso a las salas a\n'),
+         write('visitar para tener una experiencia a su gusto.\n'),nl,
+         write('\nAdemás al finalizar le indicará qué tipo de visitante ha sido\n'),
+         write('y si se corresponde con lo previsto a su entrada.\n\n'),nl,
+         write('Por favor escriba su nombre: (ejemplo "Pablo".) '),read(VISITANTE),
+         assert(nombreVisitante(VISITANTE)),nl, write(' Bienvenido '),
+         write(VISITANTE), write(' indica ahora el motivo de su visita: (escriba el número seguido de un punto)'),nl,
+         write('\n1.Curiosidad, pasaba por aquí\n'),
+         write('2.Postureo\n'),
+         write('3.Me gustan los museos\n'),
+         write('4.Es gratis\n'),nl,
+         read(TIPOVISITANTE),
+         inicioVisita(TIPOVISITANTE).
+
+%predicado de seleccion tipo visitante y conduce a la sala uno
+inicioVisita(TIPOVISITANTE) :- TIPOVISITANTE == 1, assert(valoracionVisita(50)),
+                                write('\n es usted curioso ehh, veremos qué tal le parece la primera sala'), 
+                                assert(tipoVisitante(curioso)), assert(maximaValoracion(220)), 
+                                assert(minimaValoracion(70)),observar, nombreVisitante(Nomb),assert(visitaActual(curioso,Nomb,0,[])),
+                                visita_sala_uno;
+                               TIPOVISITANTE == 2, assert(valoracionVisita(10)),write('\n pocas fotos podrá hacer'),
+                               assert(tipoVisitante(postureo)), assert(maximaValoracion(95)), 
+                               assert(minimaValoracion(15)),observar, nombreVisitante(Nomb),assert(visitaActual(postureo,Nomb,0,[])),visita_sala_uno;
+                               TIPOVISITANTE == 3, assert(valoracionVisita(80)),write('\n pues sin duda este le gustará'),
+                               assert(tipoVisitante(perfecto)), assert(maximaValoracion(260)), 
+                               assert(minimaValoracion(120)),observar, nombreVisitante(Nomb),assert(visitaActual(perfecto,Nomb,0,[])),visita_sala_uno;
+                               TIPOVISITANTE == 4, assert(valoracionVisita(20)),write('\n la tienda está a la salida y no hay escapatoria'),
+                               assert(tipoVisitante(gorron)), assert(maximaValoracion(100)), 
+                               assert(minimaValoracion(20)),observar, nombreVisitante(Nomb),assert(visitaActual(gorron,Nomb,0,[])),visita_sala_uno.
+                               
+%predicado de entrada a la sala uno
+visita_sala_uno :- clearScreen, cabecera_salas,
+                write('\n\nEstá usted en la Primera Sala') ,nl,
+                            write('\n\n'),nl,
+                            write('\n Elija qué pieza le gusta más de entre las expuestas\n\n'),nl,
+                            write('1.Cuadro ---->>'), pieza_mostrada(cuadro_uno),nl,nl,
+                            write('2.Cuadro ---->>'), pieza_mostrada(cuadro_dos),nl,nl,
+                            write('3.Escultura  >>'), pieza_mostrada(escultura_uno),nl,nl,nl,
+                            assert(salaVisita(entrada_museo)),
+                            read(ELECCION),
+                            valorar_eleccion_entrada(ELECCION).
+
+%predicado de seleccion obra elegida en sala uno
+valorar_eleccion_entrada(ELECCION) :- ELECCION == 1,tipoVisitante(Visitante), reaccion_visita(cuadro_uno, Visitante);
+                                
+                                ELECCION == 2, tipoVisitante(Visitante),reaccion_visita(cuadro_dos, Visitante);
+                                
+                                ELECCION == 3, tipoVisitante(Visitante),reaccion_visita(escultura_uno, Visitante).
+
+
+%predicado de entrada a la sala dos
+visita_sala_dos :- clearScreen, cabecera_salas, write('\n\nEstá usted en la Sala Dos') ,nl,
+                            write('\n\n'),nl,
+                            write('\n Elija qué pieza le gusta más de entre las expuestas\n\n'),nl,
+                            write('1.Cuadro ---->>'), pieza_mostrada(cuadro_tres),nl,nl,
+                            write('2.Escultura  >>'), pieza_mostrada(escultura_dos),nl,nl,
+                            write('3.Escultura  >>'), pieza_mostrada(escultura_tres),nl,nl,nl,
+                            read(ELECCION),
+                            valorar_eleccion_salados(ELECCION).
+
+%seleccion de la obra elegida
+valorar_eleccion_salados(ELECCION) :- ELECCION == 1, tipoVisitante(Visitante), reaccion_visita(cuadro_tres, Visitante);
+                            
+                            ELECCION == 2, tipoVisitante(Visitante), reaccion_visita(escultura_dos, Visitante);
+                            
+                            ELECCION == 3, tipoVisitante(Visitante), reaccion_visita(escultura_tres, Visitante).
+                                    
+                                                       
+%predicado de entrada a la sala tres                         
+visita_sala_tres :- clearScreen, cabecera_salas, write('\n\nEstá usted en la Sala Tres') ,nl,
+                            write('\nEsta sala está abarrotada de gente haciendo fotos a las dos obras'),nl,
+                            write('sin duda es la sala que buscaba'),
+                            write('\n\n'),nl,
+                            write('\n Elija qué pieza le gusta más de entre las expuestas\n\n'),nl,
+                            write('1.Cuadro ---->>'), pieza_mostrada(cuadro_cuatro),nl,nl,
+                            write('2.Escultura  >>'), pieza_mostrada(escultura_cuatro),nl,nl,
+                            read(ELECCION),
+                            valorar_eleccion_sala_tres(ELECCION).
+
+%seleccion de la obra elegida
+valorar_eleccion_sala_tres(ELECCION) :- ELECCION == 1, tipoVisitante(Visitante), reaccion_visita(cuadro_cuatro, Visitante);
+                            ELECCION == 2, tipoVisitante(Visitante), reaccion_visita(escultura_cuatro, Visitante).
+
+%predicado de entrada a la sala cuatro
+visita_sala_cuatro :- clearScreen, cabecera_salas, write('\n\nEstá usted en la Sala Cuatro') ,nl,
+                            write('\n\n'),nl,
+                            write('\n Aquí únicamente tenemos esta escultura\n\n'),nl,
+                            write('Escultura  >>'), pieza_mostrada(escultura_cinco),nl,nl,nl,
+                            valor_seleccion(10), observar, cambiar_de_sala(tienda),visita_tienda.
+
+%predicado de entrada a la sala cinco
+visita_sala_cinco :- clearScreen, cabecera_salas, write('\n\nEstá usted en nuestra exclusiva Sala Cinco\n\n\n'),nl,
+                            write('Disfrute y saboree su estancia sin límite, pocos visitantes llegan aquí\n\n'),nl,
+                            write('1.Cuadro ---->>'), pieza_mostrada(cuadro_cinco), observar,valorar_eleccion_sala_cinco.
+
+%seleccion en funcion del tipo de visitante
+valorar_eleccion_sala_cinco :- es_visitante(curioso), write('\nSu buen gusto es exquisito\n'),
+                                valor_seleccion(50), cambiar_de_sala(salida), salida_museo;
+                                es_visitante(perfecto), write('\nDa gusto contar con visitantes selectos como usted\n'),
+                                valor_seleccion(50), cambiar_de_sala(salida), salida_museo.
+
+
+%predicado de entrada a la sala menor o sala seis
+visita_sala_seis :- clearScreen, cabecera_salas, write('\n\nEstá usted en la Sala Menor') ,nl,
+                            write('\n\n'),nl,
+                            write('\n Elija qué pieza le gusta más de entre las expuestas\n\n'),nl,
+                            write('1.Cuadro ---->>'), pieza_mostrada(cuadro_seis),nl,nl,
+                            write('2.Cuadro ---->>'), pieza_mostrada(cuadro_siete),nl,nl,
+                            read(ELECCION),
+                            valorar_eleccion_sala_seis(ELECCION).
+
+%seleccion de las opciones de la obra
+valorar_eleccion_sala_seis(ELECCION) :- ELECCION == 1, tipoVisitante(Visitante), reaccion_visita(cuadro_seis, Visitante);
+                            
+                            ELECCION == 2, tipoVisitante(Visitante), reaccion_visita(cuadro_siete, Visitante).
+                           
+                            
+%predicado de entrada a la sala mayor o sala siete
+visita_sala_siete :- clearScreen, cabecera_salas, write('\n\nEstá usted en la Sala Mayor') ,nl,
+                            write('\n\n'),nl,
+                            write('\n Elija qué pieza le gusta más de entre las expuestas\n\n'),nl,
+                            write('1.Escultura  >>'), pieza_mostrada(escultura_seis),nl,nl,
+                            write('2.Escultura  >>'), pieza_mostrada(escultura_siete),nl,nl,nl,
+                            read(ELECCION),
+                            valorar_eleccion_sala_siete(ELECCION).
+
+%seleccion de las opciones de la obra
+valorar_eleccion_sala_siete(ELECCION) :- ELECCION == 1, tipoVisitante(Visitante), reaccion_visita(escultura_seis, Visitante);
+                            ELECCION == 2, tipoVisitante(Visitante), reaccion_visita(escultura_siete, Visitante).
+
+
+
+%predicado de entrada a la tienda
+visita_tienda :- clearScreen, cabecera_salas,write('\n\nEstá usted en la tienda'),nl,nl,
+                            write('\nElija qué va a hacer\n\n'),nl,
+                            write('1.Comprar algo\n'),
+                            write('2.Salir de aquí ya\n'),
+                            read(ELECCION),
+                            valorar_eleccion_tienda(ELECCION).
+
+%seleccion de las opciones en la tienda
+valorar_eleccion_tienda(ELECCION) :- ELECCION == 1, es_visitante(curioso), write('GRACIAS\n\n'),
+                                        write('\nAhora se marcha a su casa con un buen recuerdo\n'),
+                                        valor_seleccion(10),cambiar_de_sala(salida),observar, salida_museo;
+                                        ELECCION == 2, es_visitante(curioso), write('\nLa curiosidad mató al gato.'),
+                                        write('\nSinceramente no sé a qué vino aquí, en fin,\n'),nl, valor_seleccion(-10),
+                                        write('\nla salida está por allí, andando'), cambiar_de_sala(salida), observar,salida_museo;
+                                        ELECCION == 1, es_visitante(postureo), write('\nLe perdonamos lo del postureo, vuelva pronto\n'),
+                                        valor_seleccion(10), cambiar_de_sala(salida), observar,salida_museo;
+                                        ELECCION == 2, es_visitante(postureo), write('\nQue le aprovechen los likes\n'),
+                                        cambiar_de_sala(salida), valor_seleccion(-15), observar,salida_museo;
+                                        ELECCION == 1, es_visitante(perfecto), write('\nGracias por su colaboración\n'),
+                                        valor_seleccion(20), cambiar_de_sala(salida), observar,salida_museo;
+                                        ELECCION == 2, es_visitante(perfecto), write('\n¿De verdad le gustan los museos?\n'),
+                                        cambiar_de_sala(salida), valor_seleccion(-10), observar,salida_museo;
+                                        ELECCION == 1, es_visitante(gorron), write('\nBuena decisión, gracias\n'),
+                                        valor_seleccion(20), cambiar_de_sala(salida), observar,salida_museo;
+                                        ELECCION == 2, es_visitante(gorron), write('\nAl menos sabemos que no volverá de nuevo\n'),
+                                        cambiar_de_sala(salida), valor_seleccion(-20), observar,salida_museo.
+
+
+
+%salimos de la galeria y finalizamos el programa
+salida_museo :- clearScreen, cabecera_salas, evaluar_valoracion_final, retract(nombreVisitante(BorrarV)), retract(tipoVisitante(BorrarT)), retract(salasVisitadas(BorrarS)),
+				assert(salasVisitadas([taquilla])), retract(salaVisita(BorrarSV)),retract(visitaActual(AA,BB,CC,DD)). 
+
+%evaluamos la accion del visitante de forma global para mostrarla a la salida
+evaluar_valoracion_final :- tipoVisitante(Visitante), valoracionVisita(Total_valoracion), 
+                            actualizaVisita(Visitante),mostrar_valoracion_final(Total_valoracion).
+
+%calculamos los valores finales del visitante
+mostrar_valoracion_final(Total_valoracion) :- write('*********** V A L O R A C I Ó N ....................\n'),
+											  write('...............................F I N A L ***********'),
+											  write('\n\nSu puntuación total en cuanto a visita es '),write(Total_valoracion),
+                                              write(' sobre '), maximaValoracion(MaxValoracion), write(MaxValoracion),
+                                              minimaValoracion(MinValor), write(' (valor mínimo posible -> '), write(MinValor), write(')'),
+                                              write('\n\nSu recorrido ha sido ->>>> '), salasVisitadas(Itinerario), 
+                                              invertir_recorrido(Reverse_itinerario,Itinerario), write(Reverse_itinerario),
+                                              tipoVisitante(VPrevisto), itinerario_previsto(VPrevisto), 
+                                              incluir_recorrido(Reverse_itinerario),visitaActual(TipoV, NombV, ValV,RecV),
+                                              mostrar_Perfil(NombV).
+
+%se añade el recorrido realizado al perfil del visitante
+incluir_recorrido(ItinFinal) :- retract(visitaActual(TipoV, NombV, ValV, RecV)), assert(visitaActual(TipoV, NombV, ValV, ItinFinal)).                                              
+
+%mostramos el perfil del visitante
+mostrar_Perfil(NombV) :- visitaActual(TipoV, NombV, ValV, RecV), write('\n\n El visitante '), write(NombV), write(' es un visitante '),
+                         write(TipoV), write(', tiene una valoración de: '), write(ValV), write(' y su recorrido ha sido: '),
+                         write(RecV).
+
+%predicados para invertir la lista del recorrido realizado
+invertir_recorrido([],[]).
+invertir_recorrido([H|T],L):- invertir_recorrido(T,R), concatenar(R,[H],L).
+
+concatenar([],L,L).
+concatenar([X|L1],L2,[X|L3]):- concatenar(L1,L2,L3).
