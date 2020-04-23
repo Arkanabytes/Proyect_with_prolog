@@ -1,0 +1,155 @@
+% Oficina y los marrones
+%
+%
+
+% Constantes
+% Personas de la oficina
+victoriaVega.
+monicaSalazar.
+gregorioAntunez.
+bernardoMarin.
+maricarmenCanizares.
+julianPalacios.
+jesusQuesada.
+arturoCanias.
+choches.
+ricardoMesa.
+
+% Hechos sin variable
+% Hechos con constantes.
+% Definir jerarquias
+% jefe(A,B) significa que B es el jefe de A
+jefe(victoriaVega,gregorioAntunez).
+jefe(monicaSalazar,gregorioAntunez).
+jefe(bernardoMarin,victoriaVega).
+jefe(maricarmenCanizares,victoriaVega).
+jefe(julianPalacios,victoriaVega).
+jefe(jesusQuesada,victoriaVega).
+jefe(arturoCanias,victoriaVega).
+jefe(choches,monicaSalazar).
+jefe(ricardoMesa,monicaSalazar).
+
+%Asignamos personalidades
+%Sujetos Activos
+enmarronador(victoriaVega).
+asignador(monicaSalazar).
+reiDoMarron(gregorioAntunez).
+
+%Sujetos Pasivos
+enmarronado(bernardoMarin).
+enmarronado(maricarmenCanizares).
+buscaMarrones(julianPalacios).
+buscaMarrones(jesusQuesada).
+comeMarrones(arturoCanias).
+comeMarrones(choches).
+becario(ricardoMesa).
+
+%Tipo de marrones
+tipoMarron(flotante).
+tipoMarron(imprevisto).
+tipoMarron(fulminante).
+tipoMarron(noEvitable).
+tipoMarron(mutante).
+tipoMarron(pataNegra).
+tipoMarron(autoMarron).
+tipoMarron(ultimaHora).
+tipoMarron(autodetectable).
+tipoMarron(sonda).
+
+%A es activo si A es jefe de B
+%Y además A es de tipo enmarronador, asignador, reiDoMarron
+esActivo(A) :-
+	jefe(A,B),
+	enmarronador(A);
+	jefe(A,B),
+	asignador(A);
+	reiDoMarron(A).
+	
+esPasivo(A) :-	
+	enmarronado(A);
+	buscaMarrones(A);
+	comeMarrones(A);
+	becario(A).
+	
+%Definicion de relacion
+relacionColegueo(A,B) :-
+	esPasivo(A),
+	esPasivo(B),
+	A \== B.
+
+relacionCompetitiva(A,B) :-
+	esActivo(A),
+	esActivo(B),
+	A \== B.
+	
+relacionSumisa(A,B) :-
+	esActivo(A),
+	esPasivo(B),
+	A \== B.
+	
+%Predicado dinamico para gente quemada
+:-dynamic quemados/1, equipoEnmarronado/2, conversacionProyecto/1.
+quemados([]).
+equipoEnmarronado(X,Y).
+conversacionProyecto(X).
+
+% hechos con variable
+% Modifica la lista de quemados
+anadirQuemado(P,L,[P|L]).
+
+% Agrega una persona quemada a la base del conocimiento
+agregar(Persona) :- quemados(X),
+		   anadirQuemado(Persona,X,Y),
+		   retract(quemados(_)),
+		   assert(quemados(Y)).
+
+% Predicado recursivo, imprime la lista de personas que ya se han quemado
+listaQuemados([])     :- write("Nadie se ha quemado aún."), !.
+listaQuemados([P|[]]) :- write(P), nl, !.
+listaQuemados([P|R])  :- listaQuemados(R),
+			      write(P), nl.
+
+addFrase(Frase) :-
+	asserta(conversacionProyecto(Frase)).
+	
+popFrase(Frase) :-
+	retract(conversacionProyecto(Frase)),
+    !.
+
+%Posibles contestaciones a un proyecto
+frasesInicioMarronColegueo(['Necesito ayuda, esto es una liada.','Vengo con el marrón calentito.', 'Pues ya que estás aquí podrías ponerte con esto.', 'No tengo ni idea por dónde coger esto.']).
+frasesRespuestaMarronColegueo(['En media hora esto te lo tengo hecho.','Venga, pero mañana me invitas al café.', 'Este es un marrón de los buenos, pero por se tú lo hago.','Luego me arrepentiré, pero trae aquí ese marrón.']).
+frasesInicioMarronSumisa(['¿Tienes un momentito para esto?','Quedan 10 minutos para salir pero esto se acaba en 5.']).
+frasesRespuestaMarronSumisa(['Gracias. No tengo todavía nada que hacer de 3 a 4 de la mañana...','Total, para lo que iba a hacer en casa...']).
+	
+%Marrón entre dos trabajadores
+%TipoMarron
+lanzarMarron(PersonaA,PersonaB) :-
+	relacionColegueo(PersonaA,PersonaB),
+	asserta(equipoEnmarronado(PersonaA,PersonaB)),
+	frasesRespuestaMarronColegueo(FrasesInicio),
+	eleccionAleatoria(FrasesInicio, FraseInicio),
+	addFrase(FraseInicio),
+	frasesInicioMarronColegueo(FrasesFinal),
+	eleccionAleatoria(FrasesFinal, FraseFin),
+	addFrase(FraseFin);
+	relacionSumisa(PersonaA,PersonaB),
+	agregar(PersonaB),
+	asserta(equipoEnmarronado(PersonaA,PersonaB)),
+	frasesRespuestaMarronSumisa(FrasesInicio),
+	eleccionAleatoria(FrasesInicio, FraseInicio),
+	addFrase(FraseInicio),
+	frasesInicioMarronSumisa(FrasesFinal),
+	eleccionAleatoria(FrasesFinal, FraseFin),
+	addFrase(FraseFin).
+
+eleccionAleatoria(List, Elt) :-
+        length(List, Length),
+        random(0, Length, Index),
+        nth0(Index, List, Elt).
+
+informe:-equipoEnmarronado(A,B),nonvar(A),nonvar(B),write(A),write(' asigna marrón a '),write(B),nl,fail.
+conversacion:-conversacionProyecto(X),nonvar(X),write(X),nl,fail.
+verQuemados:-write('Estas personas ya están muy quemadas:'),nl,
+			 quemados(Q),
+			 listaQuemados(Q), nl.
