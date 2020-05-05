@@ -1,0 +1,166 @@
+/*
+ * MetMusTher
+ * ----------
+ * Meteo-Musical Therapy Simulator (Simulador de terapias meteomusicales)
+ * Asignatura: Fundamentos de inteligencia artificial
+ *
+ * Este fichero contiene los predicados utilizados para la creaciÃ³n de menÃºs y
+ * la navegaciÃ³n por los mismos.
+ */
+
+
+
+:- encoding(utf8).      % RepresentaciÃ³n adecuada de acentos.
+% Borrar pantalla.
+clrscr :-
+	write('\033[2J'),
+	welcome.
+
+welcome :-
+	write("MetMusTher 1.0 alpha"), nl,
+	write("--------------------"), nl, nl,
+	write("El objetivo de este programa es el de evaluar la capacidad de mejorar el estado "), 
+	write("de Ã¡nimo de las personas, a travÃ©s de canciones relacionadas con las "), 
+	write("condiciones meteorolÃ³gicas, y con los estados de Ã¡nimo de los sujetos."), nl, nl .
+
+% MenÃº inicial.
+inicio :-
+    clrscr,
+	write('Elija una de las siguientes opciones:'), nl,
+	tab(5),write('[ 1.] AÃ±adir sujeto.'), nl,
+    inicioTerapias, 
+    inicioResultados,
+    tab(5),write('[ q.] Salir.'), nl, nl,
+	write('OpciÃ³n: '), read(O), opcionInicio(O).
+
+inicioTerapias :-
+	(sujetos(L), length(L,N), (N = 0, !);
+	tab(5),write('[ 2.] Consultar sujetos.'), nl,
+    tab(5),write('[ 3.] Aplicar terapia a '), sujetos([S|_]), getNombre(S, Nombre), write(Nombre), nl,
+	tab(5),write('[ 4.] Aplicar terapia a todos los sujetos de estudio.'), nl).
+    
+inicioResultados :-
+    (exitos(L), length(L,N), (N = 0, !);
+    tab(5),write('[ r.] Ver lista de reproducciÃ³n de un caso de Ã©xito.'), nl,
+    tab(5),write('[ b.] Borrar casos de Ã©xito.'), nl).
+% Selector de acciones para el menÃº principal.
+opcionInicio(1) :- nuevoSujeto.
+opcionInicio(2) :- sujetos(L), length(L,N), N > 0, verSujetos, inicio.
+opcionInicio(3) :- sujetos([S|L]), length([S|L],N), N > 0, terapiaSujeto(1, S), pausar, inicio.
+opcionInicio(4) :- sujetos(L), length(L,N), N > 0, clrscr, write("TERAPIA COMPLETA"), nl, write("----------------"), nl, terapiaCompleta(1), pausar, inicio.
+opcionInicio(r) :- exitos(L), length(L,N), N > 0, clrscr, verExitos.
+opcionInicio(b) :- exitos(L), length(L,N), N > 0, borrarExitos, inicio.
+opcionInicio(q) :- write("Hasta pronto!"), nl, !.
+opcionInicio(_) :- write("OpciÃ³n no vÃ¡lida. "), pausar, inicio.
+
+% AcciÃ³n. CreaciÃ³n de un nuevo sujeto.
+nuevoSujeto :-
+    clrscr,
+    write("Alta de un nuevo sujeto de estudio. Introduzca los datos solicitados."), nl,
+    write("Nombre del sujeto [entre comillas, p.e. 'John Doe'] "), read(Nombre),
+    write("Estilo musical predilecto [indique el nÃºmero correspondiente]"), nl,
+    findall(Est, estilo(Est), Estilos),
+    listar(Estilos),
+    write("[#] "), read(NumEst), obtenerEstilo(NumEst, Estilo),
+    write("Estado de Ã¡nimo del paciente [indique el nÃºmero correspondiente]"), nl,
+    findall(Car, caracter(Car), Caracteres),
+    listar(Caracteres),
+    write("[#] "), read(NumCar), obtenerCaracter(NumCar, Caracter),
+    crearSujeto(Nombre, Estilo, Caracter),
+    write("Sujeto creado y aÃ±adido a la simulaciÃ³n. "), pausar,
+    inicio.
+
+% Muestra un listado de opciones numeradas a partir de una lista.
+listar(L) :- listarOpciones(1, L).
+
+% Crea recursivamente una lista de opciones numeradas a partir de una lista.    
+listarOpciones(_, []).
+listarOpciones(N, [H|T]) :-
+    write("[ "), write(N), write(".] "), write(H), nl,
+    S is N + 1,
+    listarOpciones(S, T).
+obtenerEstilo(N, Estilo) :-
+    findall(E, estilo(E), Estilos),
+    buscarEstilo(N, 1, Estilos, Estilo).
+    
+buscarEstilo(_, _, [], Estilo) :- Estilo = "No encontrado".
+buscarEstilo(N, Indice, [C|T], Estilo) :-
+    (N == Indice, Estilo = C, !);
+    Siguiente is Indice + 1,
+    buscarEstilo(N, Siguiente, T, Estilo).
+    
+obtenerCaracter(N, Caracter) :-
+    findall(C, caracter(C), Caracteres),
+    buscarCaracter(N, 1, Caracteres, Caracter).
+    
+buscarCaracter(_, _, [], Caracter) :- Caracter = "No encontrado".
+buscarCaracter(N, Indice, [C|T], Caracter) :-
+    (N == Indice, Caracter = C, !);
+    Siguiente is Indice + 1,
+    buscarCaracter(N, Siguiente, T, Caracter).
+    
+% AcciÃ³n. Listado de los sujetos de estudio.
+verSujetos :-
+    clrscr,
+    write("Listado de sujetos de estudio"), nl, nl,
+    format("|~a~t~30||~t~a~t~25+|~a~t~25+|~n", ["Nombre", "Estilo", "Estado de Ã¡nimo"]),
+    write("|-----------------------------|------------------------|------------------------|"), nl,
+    sujetos(Sujetos), mostrarSujetos(Sujetos), nl, pausar,
+    inicio.
+    
+mostrarSujetos([]).
+mostrarSujetos([H|T]) :-
+    getNombre(H, Nombre),
+    getGusto(H, Estilo),
+    getCaracter(H, Caracter),
+    format("|~a~t~30||~t~a~t~25+|~t~a~t~25+|~n", [Nombre, Estilo, Caracter]),
+    mostrarSujetos(T).
+
+%AcciÃ³n. Listado de los casos de Ã©xito.
+verExitos :-
+    clrscr,
+    write("Elija el caso de Ã©xito para el que quiere ver la lista de canciones"), nl, nl,
+    exitos(Exitos),
+    listarExitos(1, Exitos),
+    write("[#] "), read(NumExito), obtenerExito(NumExito, Exito),
+    %clrscr,
+    write("Lista de canciones"), nl, nl,
+    format("|~a~t~40||~a~t~30+|~a~t~60+|~n", ["Titulo", "Interprete", "URL"]),
+    write("|---------------------------------------|-----------------------------|-----------------------------------------------------------|"), nl,
+    getLista(Exito, Canciones), mostrarCanciones(Canciones), nl, pausar, inicio.
+    
+mostrarCanciones([]).
+mostrarCanciones([H|T]) :-
+    getTitulo(H, Titulo),
+    getInterprete(H, Interprete),
+    getUrl(H, Url),
+    format("|~a~t~40||~a~t~30+|~a~t~60+|~n", [Titulo, Interprete, Url]),
+    mostrarCanciones(T).
+
+% Muestra un listado de los sujetos que han supuesto un caso de Ã©xito.
+listarExitos(_,[]).
+listarExitos(N, [H|T]) :-
+    getNombre(H, Nombre),
+    write("[ "), write(N), write(".] "), write(Nombre), nl,
+    S is N + 1,
+    listarExitos(S, T).
+
+obtenerExito(N, Exito) :-
+    exitos(Exitos),
+    buscarExito(N, 1, Exitos, Exito).
+    
+buscarExito(_,_, [], Exito) :- Exito = "No encontrado".
+buscarExito(N, Indice, [H|T], Exito) :-
+    (N = Indice, Exito = H, !);
+    Siguiente is Indice + 1,
+    buscarExito(N, Siguiente, T, Exito).
+    
+borrarExitos :-
+    clrscr,
+    write("Se borrarÃ¡n los datos de todos los casos de Ã©xito. Â¿Continuar [s./n.]?"),
+    read(Confirma), 
+    Confirma = s, retract(exitos(_)), asserta(exitos([])), write("Se han borrado los casos de Ã©xito. "), pausar.
+% Hace una pausa hasta que el usuario pulse enter
+pausar :- 
+    write("Pulse [Enter] para continuar"),
+    skip(10), skip(10), nl.
