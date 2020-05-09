@@ -6,87 +6,138 @@
 /*** Autor:     Consuelo Pinto Toro             ***/
 /**************************************************/
 
-go:hipotesis(Enfermedades),
-write('Es posible que tengas: ');
-write(Enfermedades),
+id_pandemias:- suposicion(Enfermedad),
+write('Creo que el paciente tiene puede tener enfermedad de: '),
+write(Enfermedad),
 nl,
-undo;
+write('Alerta!'),
+undo.
 
-%Hipotesis que deben ser comprobadas
-Hipotesis(ebola):-
-Hipotesis(coronavirus):-
-Hipotesis(porcina):-
-Hipotesisa(aviar):-
-Hipotesis(sida):-
-Hipotesis(influeza):-
-Hipotesis(desconocida):-
- 
-%hipotesis identificacion de sintomas    
-ebola:-
-verifica(fiebre),
-verifica(dolor_cabeza),
-verifica(dolores_musculares),
-verifica(diarrea_vomitos),
-verifica(erupciones_piel),
-    
-coronavirus:-
-verifica(fiebre),
-verifica(tos),
-verifica(dificultat_respiratoria),
-verifica(escalofrios),
-verifica(perdida_olftato),
+/*suposicion debería ser probado*/
+suposicion(coronavirus) :- coronavirus, !.
+suposicion(ebola) :-  ebola, !.
+suposicion(porcina) :- porcina, !.
+suposicion(aviar) :- aviar, !.
+suposicion(sida) :- sida, !.
+suposicion(desconocida). /* no diagnosis*/
 
+/*suponer Identification Rules*/
 
-porcina:-
-verifica(tos),
-verifica(dolor_cabeza),
-verifica(fiebre),
-verifica(falta_apetito),
-verifica(congestion_nasal),
-verifica(nauseas_vomitos_dolor_abdominal),
+coronavirus :-
+id(fiebre),
+id(dolor_cabeza),
+id(dificultad_respiratoria),
+id(perdida_olfato),
+id(tos_estornudos),
+id(dolor_garganta),
+write('Consejos y sugerencias:'),
+nl,
+write('1: Paracetamol/tab'),
+nl,
+write('2: panadol/tab'),
+nl,
+write('3: Ibuprofeno'),
+nl,
+write('No existe una vacuna contra el coronavirus, solo guardar reposo y beber líquidos abundante los síntomas desaparecerán en pocos días.'),
+nl.
 
+ebola :-
+id(fiebre),
+id(dolor_cabeza),
+id(dolor_extremidades),
+id(conjuntivitis),
+id(erupciones),
+id(dolor_articulaciones),
+write('Consejos y sugerencias:'),
+nl,
+write('1: Zmapp/tab'),
+nl,
+write('2: Favipiravir/tab'),
+nl,
+write('3: Interferón/tab'),
+nl,
+write('La recuperacion dependera del sistema inmunologico, mantener presion presion arterial normal y estado de oxigeno'),
+nl.
 
-aviar:-
-verifica(fiebre_38),
-verifica(dolor_extremidades),
-verifica(insomnio),
-verifica(dolor_muscular),
-verifica(dolor_garganta),
-   
-sida:-
-verifica(aftas),
-verifica(dolor_garganta),
-verifica(infecciones_recurrentes),
-verifica(cansancio_persistente),
-verifica(perdida_peso),
-    
-influeza:-
-verifica(fiebre_con_escalofrios),
-verifica(tos),
-verifica(mucosidad_nasal),
-verifica(cansancio_persistente),
-verifica(dolor_cabeza),
-   
-/*Como hcaer preguntas*/
-ask(Preguntas):-
-write('El paciente tiene los siguientes sintomas '),
+porcina :-
+id(dolor_cabeza),
+id(dolor_abdominal),
+id(poco_apetito),
+id(fiebre),
+write('Consejos y sugerencias:'),
+nl,
+write('1: Amantadina/tab'),
+nl,
+write('2: Rimantadina/tab'),
+nl,
+write('3: Oseltamivir/tab'),
+nl,
+write('4: Zanamivir/tab'),
+nl,
+write('Please do complete bed rest and take soft Diet Because'),
+nl.
+
+aviar :-
+id(fiebre_38),
+id(dolor_extremidades),
+id(erupciones),
+id(insomnio),
+id(diarrea),
+id(tos_estornudos),
+write('Consejos y sugerencias:'),
+nl,
+write('1: Paracetamol/tab'),
+nl,
+write('2: Aleve/tab'),
+nl,
+write('3: Advil/tab'),
+nl,
+write('4: Vacuna'),
+nl,
+write('No viajar, descansar y beber líquido'),
+nl.
+
+sida :-
+id(aftas),
+id(dolor_garganta),
+id(dolor_cabeza),
+id(cansancio_persistente),
+id(perdida_peso),
+id(infecciones_recurrentes),
+write('Consejos y sugerencias:'),
+nl,
+write('1: Abacavir/tab'),
+nl,
+write('2: Emtricitabina/tab'),
+nl,
+write('3: Lamivudina/tab'),
+nl,
+write('4: Nevirapina'),
+nl,
+write('Para las personas con el VIH, deben cumplir tratamiento es clave para mantenerse sanas y acudir a todas las citas medicas'),
+nl.
+
+/* how to ask questions */
+ask(Preguntas) :-
+write('Tiene los siguiente síntomas?:'),
 write(Preguntas),
-write('?'),
-read(respuesta),
+write('? '),
+read(Respuesta),
 nl,
- (   (respuesta == si; respuesta == s)
- ->  
-confirmar(si(Preguntas));
-confirmar(no(Preguntas)),fail).
+( (Respuesta == si ; Respuesta == s)
+->
+assert(yes(Preguntas)) ;
+assert(no(Preguntas)), fail).
 
 :- dynamic yes/1,no/1.
-/*COMO VERIFERICAREMOS*/
-verifica(S):-
-    (si(s):
-    ->  
-    true;
-    (no(s)
-    fail ;
+/*How to id something */
+id(S) :-
+(yes(S)
+->
+true ;
+(no(S)
+->
+fail ;
 ask(S))).
 /* undo all yes/no assertions*/
 undo :- retract(yes(_)),fail.
