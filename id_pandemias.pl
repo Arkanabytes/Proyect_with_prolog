@@ -6,19 +6,19 @@
 /*** Autor:     Consuelo Pinto Toro             ***/
 /**************************************************/
 
-id_pandemias:- suposicion(Enfermedad),
-write('Creo que el paciente tiene puede tener enfermedad de: '),
+id_pandemias:- suponer(Enfermedad),
+write('Observacion: el paciente es posible que tenga la enfermedad: '),
 write(Enfermedad),nl,
 write('Alerta!'),
 undo.
 
-/*suposicion debería ser probado*/
-suposicion(coronavirus) :- coronavirus, !.
-suposicion(ebola) :-  ebola, !.
-suposicion(porcina) :- porcina, !.
-suposicion(aviar) :- aviar, !.
-suposicion(sida) :- sida, !.
-suposicion(desconocida). /* no diagnosis*/
+/*suponer debería ser probado*/
+suponer(coronavirus) :- coronavirus, !.
+suponer(ebola) :-  ebola, !.
+suponer(gripe_porcina) :- gripe_porcina, !.
+suponer(gripe_aviar) :- gripe_aviar, !.
+suponer(sida) :- sida, !.
+suponer(desconocida). /* no diagnosis*/
 
 /*suponer Identification Rules*/
 
@@ -50,7 +50,7 @@ write('3: Interferón/tab'),nl,
 write('La recuperacion dependera del sistema inmunologico, mantener presion presion arterial normal y estado de oxigeno'),
 nl.
 
-porcina :-
+gripe_porcina :-
 id(dolor_cabeza),
 id(dolor_abdominal),
 id(poco_apetito),
@@ -63,7 +63,7 @@ write('4: Zanamivir/tab'),nl,
 write('Por favor descanse en cama y tome una dieta blanda y no viajar'),
 nl.
 
-aviar :-
+gripe_aviar :-
 id(fiebre_38),
 id(dolor_extremidades),
 id(erupciones),
@@ -98,9 +98,9 @@ ask(Preguntas) :-
 write("**Identificador de pandemias**"), nl,
 write("El objetivo de este programa es identificar el enfermedades epidemiologicas "), nl,
 write("proporcionando los sintomas que tuviese cada individuo y asi dar un pronostico."), nl, nl,
-write('Responda un "si" tiene los siguiente síntomas caso contrario indique "no":'),
+write('Responda un "si" tiene los siguiente síntomas caso contrario indique "no":- '),
 write(Preguntas),
-write('? '),
+write(' ? '),
 read(Respuesta),
 nl,
 ( (Respuesta == si ; Respuesta == s)
