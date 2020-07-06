@@ -1,5 +1,6 @@
 /**************************************************/
 /*** Nombre:    identificadorEnfermedades.pl    ***/
+/*** Nombre:    Arkanabytes.                    ***/
 /*** Practica:  Proyecto Prolog                 ***/
 /*** Tema:      Enfermedades                    ***/
 /*** Curso:     2019-2020                       ***/
