@@ -13,7 +13,6 @@ El sistema permite clasificar y razonar sobre diferentes tipos de trabajadores e
 - Riesgos asociados
 
 ## 🛠️ Tecnologías Utilizadas
-
 - **Prolog**: Lenguaje de programación lógica principal
 - **SWI-Prolog**: Intérprete recomendado para ejecutar el programa
 
@@ -154,7 +153,6 @@ Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más det
 - **Arkanabytes** - *Desarrollo inicial* - [Arkanabytes](https://github.com/Arkanabytes)
 
 ## 📞 Contacto
-
 Si tienes preguntas o sugerencias sobre el proyecto, no dudes en crear un issue o contactar directamente.
 
 ## 🔗 Enlaces Útiles
